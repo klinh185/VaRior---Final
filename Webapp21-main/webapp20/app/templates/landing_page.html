@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaRiors - Build Your Financial Habits</title>
+    <link rel="stylesheet" href="/static/landing.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="nav-container">
+        <div class="logo">
+                <img src="/static/variors_logo.png" alt="VaRiors Logo">
+        </div>
+            <nav class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#team" class="nav-link">Team</a>
+                <a href="/login" class="nav-link">Log in</a>
+                <a href="/sign-up" class="nav-button">Sign Up Free →</a>
+        </nav>
+    </div>
+        </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Build your financial habits,<br>one plan at a time.</h1>
+            <p>No more guessing. No more tracking in your head.<br> We help you plan better, spend smarter, and finally start saving — even if you've never done it before.</p>
+            <div class="hero-buttons">
+                <a href="/sign-up" class="hero-button primary-button">Get Started</a>
+                <a href="#" class="hero-button secondary-button">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-screenshot-container">
+            <img src="/static/screen.png" alt="Product Screenshot">
+        </div>
+    </section>
+
+    <section id="features" class="section-container">
+        <h2>Smarter Features, Bigger Impact</h2>
+        <p>Supercharge your financial management with intelligent planning and tracking tools, and personalized insights.</p>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-clipboard-list feature-icon"></i>
+                <h3>Plan Your Money</h3>
+                <p>Set how much to spend, save for fun goals, and build an emergency fund. Take control of your financial future.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3>Track What Happens</h3>
+                <p>Log every expense. Every loan or debt. Visualize your spending patterns and identify areas for improvement.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-chart-pie feature-icon"></i>
+                <h3>Simple & Visual</h3>
+                <p>An intuitive interface designed for clarity. See your finances at a glance, made for everyone from first-jobbers to final-year students.</p>
+            </div>
+        </div>
+        <!-- You can add a button here if needed, similar to the reference image's 'Explore the platform' -->
+    </section>
+
+    <section id="about" class="section-container">
+        <div class="about-background-accent"></div>
+        <h2>Empowering Financial Independence, One Step at a Time</h2>
+        <p>At VaRiors, we believe that everyone deserves the opportunity to take control of their financial future—whether you're just starting your career, navigating life as a student, or planning for long-term security. Our mission is to make financial planning simple, intuitive, and accessible for everyone. We help you build healthy financial habits through smart budgeting, goal-setting, and saving—empowering you to make confident financial decisions every day. With our tools, you don't just manage your money; you learn how to grow it, protect it, and use it to achieve your dreams. Together, we'll unlock the path to a secure and prosperous future.</p>
+        <!-- Add about content here -->
+    </section>
+
+    <section id="team" class="section-container">
+        <h2>Our Team</h2>
+        <p>Our team at VaRiors is a group of passionate and dedicated individuals united by a single goal: to empower you on your financial journey. We're excited to be on this journey with you, and we're here to help you succeed—one financial milestone at a time!</p>
+        <img src="/static/our_team.png" alt="Our Team" class="team-image">
+        <!-- Add team content here -->
+    </section>
+
+    <script>
+        // Add scroll event listener for header background change
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.nav-header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Werkzeug
+SQLAlchemy
+pydantic
+python-dateutil
+flask-migrate
+openai
+dotenv

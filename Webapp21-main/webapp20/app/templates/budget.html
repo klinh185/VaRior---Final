@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Budget{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4 theme-dependent-title">Budget Planning</h1>
+
+    <!-- Alerts Section -->
+    {% if alerts %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for alert in alerts %}
+            {% if 'saving goal' not in alert.message %}
+            <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+                {{ alert.message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Budget Overview -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Monthly Budget Overview</h5>
+                        <span class="h5 mb-0">{{ current_month.split('-')[1] }}-{{ current_month.split('-')[0] }}</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1">Total Planned</p>
+                            <h3>{{ "{:,.0f}".format(total_planned) }} VND</h3>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">Total Actual</p>
+                            <h3>{{ "{:,.0f}".format(total_actual) }} VND</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">Budget Categories</h5>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#newBudgetModal">
+                            <i class="fa fa-plus"></i> Set Budget
+                        </button>
+                    </div>
+
+                    {% if budget_data %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Planned</th>
+                                    <th>Actual</th>
+                                    <th>Remaining</th>
+                                    <th>Usage</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for budget in budget_data %}
+                                <tr>
+                                    <td>{{ budget.category }}</td>
+                                    <td>{{ "{:,.0f}".format(budget.planned) }} VND</td>
+                                    <td>{{ "{:,.0f}".format(budget.actual) }} VND</td>
+                                    <td>{{ "{:,.0f}".format(budget.remaining) }} VND</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar {% if budget.usage_percent > 100 %}bg-danger{% elif budget.usage_percent > 90 %}bg-warning{% else %}bg-success{% endif %}"
+                                                role="progressbar" style="width: {{ min(100, budget.usage_percent) }}%">
+                                                {{ "%.1f"|format(budget.usage_percent) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if budget.usage_percent > 100 %}
+                                        <span class="badge badge-danger">Over Budget</span>
+                                        {% elif budget.usage_percent > 90 %}
+                                        <span class="badge badge-warning">Near Limit</span>
+                                        {% else %}
+                                        <span class="badge badge-success">On Track</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No budgets set for this month. Click "Set Budget" to get started.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- New Budget Modal -->
+<div class="modal fade" id="newBudgetModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Monthly Budget</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select class="form-control" id="category" name="category" required>
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <input type="month" class="form-control" id="month" name="month" value="{{ current_month }}"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="planned_amount">Planned Amount (VND)</label>
+                        <input type="text" class="form-control" id="planned_amount" name="planned_amount" required
+                            pattern="[0-9,]*" inputmode="numeric" oninput="formatNumber(this)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function formatNumber(input) {
+        var num = input.value.replace(/[^\d]/g, '');
+        input.value = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,439 @@
+:root {
+    --primary-color: #00B6D1;  /* Cyan color */
+    --text-color: #1D1D1F;
+    --white: #FFFFFF;
+    --button-color: #00e1e1e8;
+}
+
+body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    line-height: 1.5;
+    background: #0d0d0d; /* Existing dark background */
+    background-attachment: fixed; /* Fix gradients relative to viewport */
+}
+
+/* Header Styles */
+.nav-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+    padding: 1.5rem 2rem;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-header.scrolled {
+    background: #1a2b37f2;
+    box-shadow: 0 4px 20px #00000033;
+    margin: 0.75rem 1.5rem;
+    border-radius: 16px;
+    padding: 0.75rem 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 35px;
+    width: auto;
+    object-fit: contain;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--white);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: opacity 0.3s ease;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+}
+
+.nav-button {
+    background: var(--button-color);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: opacity 0.3s ease;
+}
+
+.nav-button:hover {
+    opacity: 0.9;
+}
+
+/* Hero Section */
+.hero {
+    background: radial-gradient(circle at center, #0cb9c1 0%, #1b1029 60%, #0d0d0d 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    padding-bottom: 15rem; /* Increased padding-bottom for image overlap */
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-screenshot-container {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; /* Adjust as needed */
+    max-width: 900px; /* Max width for larger screens */
+    z-index: 1;
+    opacity: 0.9;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.hero-screenshot-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Smooth transition effect for the image itself */
+    mask-image: linear-gradient(to top, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 85%, transparent 100%);
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+}
+
+.hero-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--white);
+    padding: 4rem 2rem;
+    padding-bottom: 20rem; /* Increased padding-bottom to make space for the image */
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.hero-button {
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+}
+
+.primary-button {
+    background: var(--button-color);
+    color: var(--white);
+}
+
+.secondary-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 3rem;
+    }
+    
+    .email-form {
+        flex-direction: column;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+}
+
+/* General Section Styles */
+.section-container {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--white);
+}
+
+.section-container h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-container h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.section-container p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    opacity: 0.8;
+}
+
+/* Features Section Specific Styles */
+#features {
+    background: #0d0d0d; /* Dark background color for features section */
+    border-radius: 20px;
+    padding: 4rem 2rem; /* Adjust padding for the new box effect */
+    margin-top: 1rem; /* Adjusted margin-top to position below the image */
+    position: relative; /* Ensure it respects z-index if needed later */
+    z-index: 2; /* Ensure it's above other elements if overlapping */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
+}
+
+#features h2 {
+    font-size: 3.5rem; /* Slightly larger heading */
+    margin-bottom: 1rem;
+    text-align: center; /* Ensuring it's centered */
+    color: var(--white);
+    display: block; /* Ensure it's a block-level element for text-align to work reliably */
+}
+
+#features h2::after {
+    display: none; /* Remove the underline from this main heading */
+}
+
+#features > p {
+    font-size: 1.15rem;
+    max-width: 600px; /* Constrain width for readability */
+    margin: 0 auto 1.5rem; /* Reduced bottom margin */
+    text-align: center;
+    opacity: 0.9;
+    color: var(--white);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem; /* Reduced top margin */
+}
+
+.feature-item {
+    background: #1C1E26; /* Darker background for individual feature boxes */
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: left;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1), 0 8px 25px rgba(0, 0, 0, 0.3); /* Increased soft white glow and original shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.2), 0 12px 35px rgba(0, 0, 0, 0.4); /* Enhanced glow on hover */
+}
+
+.feature-icon {
+    font-size: 3.5rem; /* Adjusted font-size for icons to be proportional */
+    margin-bottom: 1.5rem; /* Adjusted margin for better spacing */
+    color: var(--white);
+    display: block;
+    /* Reverted auto margins for left alignment within box */
+    margin-left: 0; 
+    margin-right: 0;
+}
+
+.feature-item h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--white);
+}
+
+.feature-item p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7); /* Lighter text for feature descriptions */
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments for Features Section */
+@media (max-width: 768px) {
+    #features h2 {
+        font-size: 2.5rem;
+        text-align: center; /* Keeping centered for mobile */
+    }
+
+    #features > p {
+        text-align: center; /* Keeping centered for mobile */
+    }
+    
+    .feature-icon {
+        font-size: 3rem; /* Slightly smaller for mobile */
+        margin-left: auto; /* Center icons on mobile */
+        margin-right: auto; /* Center icons on mobile */
+    }
+}
+
+/* About Section Specific Styles */
+#about {
+    background: #1A1A2E; /* Slightly lighter dark background color for about section */
+    border-radius: 20px;
+    padding: 6rem 2rem; /* Consistent padding with other sections */
+    margin-top: 5rem; /* Space from the previous section */
+    text-align: center; /* Center the text content */
+    color: var(--white);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    position: relative; /* Ensure child absolute positioning works */
+    overflow: hidden; /* Hide overflowing blur */
+}
+
+.about-background-accent {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 70%;
+    height: 120%;
+    background: radial-gradient(circle at 70% 30%, rgba(12, 185, 193, 0.4) 0%, rgba(27, 16, 41, 0) 60%);
+    filter: blur(80px);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#about h2 {
+    font-size: 3.5rem; /* Consistent heading size */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+    position: relative; /* Bring text above the accent */
+    z-index: 1; /* Bring text above the accent */
+}
+
+#about h2::after {
+    display: none; /* Remove underline from this heading */
+}
+
+#about p {
+    font-size: 1.15rem;
+    max-width: 800px; /* Constrain width for readability */
+    margin: 0 auto 2rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    color: var(--white);
+    position: relative; /* Bring text above the accent */
+    z-index: 1; /* Bring text above the accent */
+}
+
+/* Responsive adjustments for About Section */
+@media (max-width: 768px) {
+    #about h2 {
+        font-size: 2.5rem;
+    }
+
+    #about p {
+        font-size: 1rem;
+    }
+}
+
+/* Team Section Specific Styles */
+#team {
+    background: #0d0d0d; /* Dark background color for team section */
+    border-radius: 20px;
+    padding: 6rem 2rem;
+    margin-top: 2rem; /* Reduced space from previous section */
+    text-align: center;
+    color: var(--white);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.team-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 3rem auto 0; /* Center image and add top margin */
+    border-radius: 12px; /* Slightly rounded corners for the image */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments for Team Section */
+@media (max-width: 768px) {
+    #team h2 {
+        font-size: 2.5rem;
+    }
+
+    #team p {
+        font-size: 1rem;
+    }
+}
+
+/* Responsive Design */

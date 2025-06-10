@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta http-equiv="Content-Language" content="en" />
+    <!-- Add this script before any other content -->
+    <script>
+      // Check and apply theme immediately before page loads
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link rel="icon" type="image/png" href="/static/dice_logo.png" />
+    <title>{% block title %}Home{% endblock %}</title>
+    <style>
+      /* Sidebar styles */
+      .wrapper {
+        display: flex;
+        width: 100%;
+        align-items: stretch;
+      }
+
+      .sidebar {
+        min-width: 250px;
+        max-width: 250px;
+        min-height: 100vh;
+        background: #343a40;
+        color: #fff;
+        transition: all 0.3s;
+        position: fixed;
+        z-index: 999;
+      }
+
+      .sidebar-header {
+        padding: 20px;
+        background: #2c3136;
+      }
+
+      .sidebar-btn {
+        width: 90%;
+        margin: 10px auto;
+        display: block;
+        padding: 15px;
+        text-align: left;
+        border-radius: 5px;
+        color: white;
+        background-color: #495057;
+        border: none;
+        transition: all 0.3s;
+        text-decoration: none;
+      }
+
+      .sidebar-btn:hover,
+      .sidebar-btn.active {
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+      }
+
+      .sidebar-btn.active {
+        background-color: #0dcaf0;
+      }
+
+      /* Main content styles */
+      #content {
+        width: 100%;
+        padding: 20px;
+        min-height: 100vh;
+        margin-left: 250px;
+        background: none;
+      }
+
+      .modal-dialog {
+        max-width: 500px;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .table-responsive {
+        margin-top: 2rem;
+      }
+
+      /* Custom alert styles */
+      .alert {
+        position: fixed;
+        top: 20px;
+        right: 140px;
+        max-width: 300px;
+        padding: 12px 20px;
+        border-radius: 15px;
+        z-index: 9999;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 0;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .alert .close {
+        padding: 0;
+        margin-left: 15px;
+      }
+
+      .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+
+      .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+
+      .table th {
+        cursor: pointer;
+      }
+
+      /* Make edit and delete buttons consistent in size */
+      .btn-sm.btn-primary,
+      .btn-sm.btn-danger {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+      }
+
+      /* Styles for Split Amount Section */
+      .split-amount-section {
+        background-color: #f7f7f7;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-top: 20px;
+      }
+
+      .split-title {
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .split-group {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #ffffff;
+        border: 1px solid #eee;
+      }
+
+      .ap-section .split-group {
+        border-color: #f8d7da;
+        /* Light red border */
+      }
+
+      .ar-section .split-group {
+        border-color: #d4edda;
+        /* Light green border */
+      }
+
+      .ap-label {
+        color: #dc3545;
+        /* Red */
+        font-weight: bold;
+      }
+
+      .ar-label {
+        color: #28a745;
+        /* Green */
+        font-weight: bold;
+      }
+
+      .equally-text {
+        font-size: 0.9em;
+        color: #6c757d;
+        float: right;
+      }
+
+      .input-group-prepend .currency-symbol {
+        width: 38px;
+        text-align: center;
+        background-color: #e9ecef;
+        border-right: none;
+        font-weight: bold;
+      }
+
+      .amount-input {
+        text-align: right;
+      }
+
+      .person-input-group {
+        margin-bottom: 0 !important;
+        /* Remove default form-group margin */
+      }
+
+      .btn-add-person {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        border-radius: 0 0.25rem 0.25rem 0;
+      }
+
+      .ap-add {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+      }
+
+      .ar-add {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+      }
+
+      .ap-remove,
+      .ar-remove {
+        background-color: #6c757d;
+        /* Grey for remove buttons */
+        border-color: #6c757d;
+        color: white;
+      }
+
+      .ap-add:hover,
+      .ar-add:hover,
+      .ap-remove:hover,
+      .ar-remove:hover {
+        opacity: 0.8;
+      }
+
+      .form-section {
+        margin-bottom: 20px;
+        padding: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 12px;
+      }
+
+      .icon-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 8px;
+        background: white;
+        padding: 3px;
+      }
+
+      .input-prefix {
+        padding: 10px;
+        border-right: 1px solid #ccc;
+        color: #333;
+        font-weight: bold;
+      }
+
+      .input-amount,
+      .input-name {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        outline: none;
+        font-size: 1em;
+      }
+
+      .add-btn {
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.2em;
+        transition: background-color 0.2s ease;
+        border-radius: 9px;
+        margin-right: 7px;
+      }
+
+      .add-btn.ap-btn {
+        background-color: #dc3545;
+      }
+
+      .add-btn.ap-btn:hover {
+        background-color: #b52c3e;
+      }
+
+      .add-btn.ar-btn {
+        background-color: #28a745;
+      }
+
+      .add-btn.ar-btn:hover {
+        background-color: #1e7e34;
+      }
+
+      .input-group.ap-group {
+        border: 1px solid #dc3545;
+      }
+
+      .input-group.ar-group {
+        border: 1px solid #28a745;
+      }
+
+      .section-title {
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+
+      .section-title.ap-title {
+        color: #dc3545;
+      }
+
+      .section-title.ar-title {
+        color: #28a745;
+      }
+
+      .transactionType-selection {
+        background-color: rgb(255, 255, 148);
+        padding: 20px;
+        border: 2px solid rgb(204, 204, 59);
+        border-radius: 12px;
+      }
+
+      .splitAmount-section {
+        border-radius: 12px;
+        padding: 10px;
+        background-color: rgb(238, 237, 237);
+        margin-top: 10px;
+      }
+
+      .amount-button-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 5px;
+      }
+
+      .person-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 10px;
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-top: 6px;
+      }
+
+      .person-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+
+      .person-name {
+        font-weight: 600;
+      }
+
+      .person-amount {
+        color: #444;
+        font-size: 0.95em;
+      }
+
+      #save-button {
+        width: 100%;
+        margin-top: 20px;
+        background-color: #1e88e5;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 0;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      #income-section,
+      #expense-section,
+      #saving-section,
+      #repayment-section,
+      #save-button {
+        display: none;
+      }
+
+      /* Adjust for Bootstrap's default mb-3 */
+      .person-input-group.mb-3 {
+        margin-bottom: 1rem !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="theme-switch">
+      <label class="switch">
+        <input type="checkbox" id="themeToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    {% if user is not none and user.is_authenticated %}
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <div
+          class="sidebar-header"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+          "
+        >
+          <a href="/"
+            ><img
+              src="/static/variors_logo.png"
+              alt="VARIORS Logo"
+              style="height: 105px"
+          /></a>
+        </div>
+
+        <button
+          class="sidebar-btn"
+          data-toggle="modal"
+          data-target="#newCashflowModal"
+        >
+          <i class="fa fa-plus"></i> New Transaction
+        </button>
+        <a href="{{ url_for('views.dashboard') }}" class="sidebar-btn">
+          <i class="fa fa-dashboard"></i> Dashboard
+        </a>
+        <a href="{{ url_for('views.cashflows') }}" class="sidebar-btn">
+          <i class="fa fa-money"></i> Cash Flows
+        </a>
+        <a href="{{ url_for('views.outstanding') }}" class="sidebar-btn">
+          <i class="fa fa-receipt"></i> Debt and Loan
+        </a>
+        <a href="{{ url_for('views.budget') }}" class="sidebar-btn">
+          <i class="fa fa-pie-chart"></i> Budget
+        </a>
+        <a href="{{ url_for('views.saving_goals_page') }}" class="sidebar-btn">
+          <i class="fa fa-trophy"></i> Saving Goals
+        </a>
+        <a
+          href="{{ url_for('views.emergency_fund_page') }}"
+          class="sidebar-btn"
+        >
+          <i class="fa fa-shield"></i> Emergency Fund
+        </a>
+
+        <a
+          href="/logout"
+          class="sidebar-btn mt-auto"
+          style="position: absolute; bottom: 20px"
+        >
+          <i class="fa fa-sign-out"></i> Logout
+        </a>
+      </nav>
+
+      <!-- Page Content -->
+      <div id="content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %} {% if category ==
+        'error' %}
+        <div
+          class="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% else %}
+        <div
+          class="alert alert-success alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %} {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+    {% else %}
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %} {% if category ==
+      'error' %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% else %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %} {% endfor %} {% endif %} {% endwith %} {% block auth_content
+      %} {% endblock %}
+    </div>
+    {% endif %}
+
+    <!-- New Cashflow Modal -->
+    {% if user.is_authenticated %}
+    <div
+      class="modal fade"
+      id="newCashflowModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="newCashflowModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <form
+          id="cashflowForm"
+          method="POST"
+          action="{{ url_for('views.add_cashflow') }}"
+        >
+          <div class="modal-content">
+            <div
+              class="modal-header"
+              style="
+                background-color: #2c3e50;
+                color: white;
+                text-align: center;
+                display: block;
+              "
+            >
+              <h4>New Transaction</h4>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+                style="color: white"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div
+              class="modal-body"
+              style="background-color: #fff8e1; padding: 20px"
+            >
+              <!-- Your custom layout remains unchanged -->
+
+              <!-- Transaction Type -->
+              <label for="transactionType">Transaction Type</label>
+              <select id="transactionType">
+                <option value="">Select Type</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+                <option value="savings">Saving</option>
+                <option value="repayment">Repayment</option>
+              </select>
+
+              <!-- Amount -->
+              <label for="cashTransaction">Cash Transaction</label>
+              <input
+                type="text"
+                id="cashTransaction"
+                placeholder="Enter amount"
+              />
+
+              <!-- Add your income, saving, repayment sections here (unchanged) -->
+              <div id="income-section">
+                <label for="income-category">Category</label>
+                <select id="income-category">
+                  <option value="">Select category...</option>
+                  <option value="Full-time Salary">Full-time Salary</option>
+                  <option value="Part-time Salary">Part-time Salary</option>
+                  <option value="Allowance">Allowance</option>
+                  <option value="scholarship">Scholarship</option>
+                  <option value="Investment">Investment</option>
+                  <option value="Business">Business</option>
+                </select>
+
+                <div class="splitAmount-section">
+                  <!-- AP Section -->
+                  <div class="section-title ap-title">
+                    Amount You Owe - Total:
+                    <span id="totalYouOwe">₫ 0.00</span>
+                  </div>
+                  <div id="income-peopleYouOweList"></div>
+
+                  <div class="input-group ap-group">
+                    <input
+                      type="text"
+                      id="newPersonYouOwe"
+                      placeholder="Add person you owe..."
+                      class="input-name"
+                    />
+                    <button
+                      class="add-btn ap-btn"
+                      onclick="addPerson('owe', event)"
+                    >
+                      ＋
+                    </button>
+                  </div>
+
+                  <div class="input-group ap-group">
+                    <span class="input-prefix">₫</span>
+                    <input
+                      type="text"
+                      id="amountYouOwe"
+                      placeholder="0.00"
+                      class="input-amount"
+                    />
+                  </div>
+
+                  <!-- AR Section -->
+                  <div class="section-title ar-title">
+                    People Owed to You - Total:
+                    <span id="totalOwedToYou">₫ 0.00</span>
+                  </div>
+                  <div id="income-peopleWhoOweYouList"></div>
+
+                  <div class="input-group ar-group">
+                    <input
+                      type="text"
+                      id="newPersonOwedToYou"
+                      placeholder="Add person who owes you..."
+                      class="input-name"
+                    />
+                    <button
+                      class="add-btn ar-btn"
+                      onclick="addPerson('owed', event)"
+                    >
+                      ＋
+                    </button>
+                  </div>
+
+                  <div class="input-group ar-group">
+                    <span class="input-prefix">₫</span>
+                    <input
+                      type="text"
+                      id="amountOwedToYou"
+                      placeholder="0.00"
+                      class="input-amount"
+                    />
+                  </div>
+
+                  <div class="section-title">
+                    Personal Tracked Amount:
+                    <span id="income-netCash">₫ 0.00</span>
+                    <!-- 🔴 NEW -->
+                  </div>
+                </div>
+              </div>
+
+              <div id="expense-section">
+                <label for="expense-category">Category</label>
+                <select id="expense-category">
+                  <option value="">Select category...</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="Food">Food</option>
+                  <option value="Transportation">Transportation</option>
+                  <option value="Dependents">Dependents</option>
+                  <option value="Shopping & Entertainment">
+                    Shopping & Entertainment
+                  </option>
+                  <option value="Health">Health</option>
+                  <option value="Education">Education</option>
+                </select>
+
+                <div class="splitAmount-section">
+                  <!-- AP Section -->
+                  <div class="section-title ap-title">
+                    Amount You Owe - Total:
+                    <span id="totalYouOwe">₫ 0.00</span>
+                  </div>
+                  <div id="expense-peopleYouOweList"></div>
+
+                  <div class="input-group ap-group">
+                    <input
+                      type="text"
+                      id="newPersonYouOwe"
+                      placeholder="Add person you owe..."
+                      class="input-name"
+                    />
+                    <button
+                      class="add-btn ap-btn"
+                      onclick="addPerson('owe', event)"
+                    >
+                      ＋
+                    </button>
+                  </div>
+
+                  <div class="input-group ap-group">
+                    <span class="input-prefix">₫</span>
+                    <input
+                      type="text"
+                      id="amountYouOwe"
+                      placeholder="0.00"
+                      class="input-amount"
+                    />
+                  </div>
+
+                  <!-- AR Section -->
+                  <div class="section-title ar-title">
+                    People Owed to You - Total:
+                    <span id="totalOwedToYou">₫ 0.00</span>
+                  </div>
+                  <div id="expense-peopleWhoOweYouList"></div>
+
+                  <div class="input-group ar-group">
+                    <input
+                      type="text"
+                      id="newPersonOwedToYou"
+                      placeholder="Add person who owes you..."
+                      class="input-name"
+                    />
+                    <button
+                      class="add-btn ar-btn"
+                      onclick="addPerson('owed', event)"
+                    >
+                      ＋
+                    </button>
+                  </div>
+
+                  <div class="input-group ar-group">
+                    <span class="input-prefix">₫</span>
+                    <input
+                      type="text"
+                      id="amountOwedToYou"
+                      placeholder="0.00"
+                      class="input-amount"
+                    />
+                  </div>
+
+                  <div class="section-title">
+                    Personal Tracked Amount:
+                    <span id="expense-netCash">₫ 0.00</span>
+                    <!-- 🔴 NEW -->
+                  </div>
+                </div>
+              </div>
+
+              <div id="saving-section">
+                <label for="savingCategory">Saving Goal</label>
+                <select id="savingCategory">
+                  <option value="">Select a goal...</option>
+                  {% for goal in user.saving_goals %}
+                  <option value="{{ goal.name }}">{{ goal.name }}</option>
+                  {% endfor %}
+                </select>
+
+                <label for="cashflow-select">Flow</label>
+                <select id="cashflow-select">
+                  <option value="">Select category...</option>
+                  <option value="cash-in">Cash In</option>
+                  <option value="cash-out">Cash Out</option>
+                </select>
+              </div>
+
+              <div id="repayment-section">
+                <label for="fromPayer">From</label>
+                <input
+                  type="text"
+                  id="fromPayer"
+                  placeholder="Enter payer name..."
+                />
+                <label for="toRecipient">To</label>
+                <input
+                  type="text"
+                  id="toRecipient"
+                  placeholder="Enter recipient name..."
+                />
+              </div>
+
+              <!-- Hidden fields for backend submission -->
+              <input type="hidden" name="amount" id="hiddenAmount" />
+              <input type="hidden" name="kind" id="hiddenKind" />
+              <input type="hidden" name="category" id="hiddenCategory" />
+              <input type="hidden" name="date" id="hiddenDate" />
+              <input type="hidden" name="description" id="hiddenDescription" />
+              <input
+                type="hidden"
+                name="flow_direction"
+                id="hiddenFlowDirection"
+              />
+
+              <div id="dynamicFieldsContainer"></div>
+
+              <button type="button" id="save-button" onclick="handleSave()">
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{{ url_for('static', filename='index.js') }}"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{{ url_for('static', filename='table.js') }}"
+    ></script>
+    <script>
+      const peopleYouOwe = [];
+      const peopleWhoOweYou = [];
+
+      function updateTransactionSections() {
+        const value = document.getElementById("transactionType").value;
+        document.getElementById("income-section").style.display = "none";
+        document.getElementById("expense-section").style.display = "none";
+        document.getElementById("saving-section").style.display = "none";
+        document.getElementById("repayment-section").style.display = "none";
+        document.getElementById("save-button").style.display = "none";
+
+        if (value === "income") {
+          document.getElementById("income-section").style.display = "block";
+        } else if (value === "expense") {
+          document.getElementById("expense-section").style.display = "block";
+        } else if (value === "savings") {
+          document.getElementById("saving-section").style.display = "block";
+        } else if (value === "repayment") {
+          document.getElementById("repayment-section").style.display = "block";
+        }
+
+        document.getElementById("save-button").style.display = "block";
+      }
+
+      // Reusable function to remove the placeholder option once user selects something
+      function setupPlaceholderRemoval(selectId, onChangeFn = null) {
+        const select = document.getElementById(selectId);
+        select.addEventListener("change", function () {
+          if (onChangeFn) onChangeFn();
+
+          const firstOption = select.querySelector("option[value='']");
+          if (firstOption) {
+            select.removeChild(firstOption);
+          }
+        });
+      }
+
+      document
+        .getElementById("cashTransaction")
+        .addEventListener("input", updateTotals);
+
+      setupPlaceholderRemoval("transactionType", updateTransactionSections);
+      setupPlaceholderRemoval("savingCategory");
+      setupPlaceholderRemoval("cashflow-select");
+
+      function renderPeople(list, containerId, type) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        list.forEach((person, index) => {
+          const div = document.createElement("div");
+          div.className = "person-entry";
+          div.innerHTML = `
+            <div class="person-info">
+              <div class="person-name">${person.name}</div>
+              <div class="person-amount">₫ ${person.amount.toFixed(2)}</div>
+            </div>
+            <button class="icon-btn" onclick="removePerson('${type}', ${index}, event)">❌</button>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      function addPerson(type, event) {
+        event.preventDefault();
+
+        // Determine which group is currently visible: income or expense
+        const isIncome =
+          document.getElementById("income-section").style.display === "block";
+        const isExpense =
+          document.getElementById("expense-section").style.display === "block";
+
+        let nameInput, amountInput, peopleList, renderId, personType;
+
+        if (isIncome) {
+          if (type === "owe") {
+            nameInput = document.querySelector(
+              "#income-section #newPersonYouOwe"
+            );
+            amountInput = document.querySelector(
+              "#income-section #amountYouOwe"
+            );
+            peopleList = peopleYouOwe;
+            renderId = "income-peopleYouOweList";
+            personType = "owe";
+          } else {
+            nameInput = document.querySelector(
+              "#income-section #newPersonOwedToYou"
+            );
+            amountInput = document.querySelector(
+              "#income-section #amountOwedToYou"
+            );
+            peopleList = peopleWhoOweYou;
+            renderId = "income-peopleWhoOweYouList";
+            personType = "owed";
+          }
+        } else if (isExpense) {
+          if (type === "owe") {
+            nameInput = document.querySelector(
+              "#expense-section #newPersonYouOwe"
+            );
+            amountInput = document.querySelector(
+              "#expense-section #amountYouOwe"
+            );
+            peopleList = peopleYouOwe;
+            renderId = "expense-peopleYouOweList";
+            personType = "owe";
+          } else {
+            nameInput = document.querySelector(
+              "#expense-section #newPersonOwedToYou"
+            );
+            amountInput = document.querySelector(
+              "#expense-section #amountOwedToYou"
+            );
+            peopleList = peopleWhoOweYou;
+            renderId = "expense-peopleWhoOweYouList";
+            personType = "owed";
+          }
+        } else {
+          // Not in income or expense section, do nothing
+          return;
+        }
+
+        const name = nameInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+
+        if (name && !isNaN(amount)) {
+          peopleList.push({ name, amount });
+          renderPeople(peopleList, renderId, personType);
+          updateTotals();
+
+          // Clear inputs
+          nameInput.value = "";
+          amountInput.value = "";
+        }
+      }
+
+      function removePerson(type, index) {
+        const isIncome =
+          document.getElementById("income-section").style.display === "block";
+        const isExpense =
+          document.getElementById("expense-section").style.display === "block";
+
+        let renderId = "";
+
+        if (isIncome) {
+          renderId =
+            type === "owe"
+              ? "income-peopleYouOweList"
+              : "income-peopleWhoOweYouList";
+        } else if (isExpense) {
+          renderId =
+            type === "owe"
+              ? "expense-peopleYouOweList"
+              : "expense-peopleWhoOweYouList";
+        }
+
+        if (type === "owe") {
+          peopleYouOwe.splice(index, 1);
+          renderPeople(peopleYouOwe, renderId, "owe");
+        } else {
+          peopleWhoOweYou.splice(index, 1);
+          renderPeople(peopleWhoOweYou, renderId, "owed");
+        }
+
+        updateTotals();
+      }
+
+      function updateTotals() {
+        const totalAP = peopleYouOwe.reduce((sum, p) => sum + p.amount, 0);
+        const totalAR = peopleWhoOweYou.reduce((sum, p) => sum + p.amount, 0);
+
+        document.getElementById(
+          "totalYouOwe"
+        ).textContent = `₫ ${totalAP.toFixed(2)}`;
+        document.getElementById(
+          "totalOwedToYou"
+        ).textContent = `₫ ${totalAR.toFixed(2)}`;
+
+        const cashValue = parseFloat(
+          document.getElementById("cashTransaction").value.replace(/,/g, "")
+        );
+
+        const selectedKind = document.getElementById("transactionType").value;
+
+        let netCash = 0;
+        if (selectedKind === "income") {
+          netCash = parseFloat(cashValue) + totalAR - totalAP;
+          document.getElementById(
+            "income-netCash"
+          ).textContent = `₫ ${netCash.toFixed(2)}`;
+        } else if (selectedKind === "expense") {
+          netCash = parseFloat(cashValue) - totalAR + totalAP;
+          document.getElementById(
+            "expense-netCash"
+          ).textContent = `₫ ${netCash.toFixed(2)}`;
+        } else {
+          netCash = isNaN(cashValue) ? 0 : cashValue;
+        }
+
+        document.getElementById("hiddenAmount").value = netCash.toFixed(2);
+      }
+
+      function handleSave() {
+        const cashValue = document
+          .getElementById("cashTransaction")
+          .value.trim();
+
+        if (!cashValue || isNaN(cashValue)) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+
+        const kind = document.getElementById("transactionType").value;
+        const flowDirection = document.getElementById("cashflow-select").value;
+
+        const totalAP = peopleYouOwe.reduce((sum, p) => sum + p.amount, 0);
+        const totalAR = peopleWhoOweYou.reduce((sum, p) => sum + p.amount, 0);
+        const netCash =
+          (isNaN(cashValue) ? 0 : parseFloat(cashValue)) + totalAP - totalAR;
+
+        document.getElementById("hiddenAmount").value =
+          parseFloat(cashValue).toFixed(2);
+        document.getElementById("hiddenKind").value =
+          kind.charAt(0).toUpperCase() + kind.slice(1).toLowerCase();
+
+        let categoryValue = "";
+        if (kind === "income") {
+          categoryValue =
+            document.getElementById("income-category")?.value || "";
+        } else if (kind === "expense") {
+          categoryValue =
+            document.getElementById("expense-category")?.value || "";
+        } else if (kind === "savings") {
+          categoryValue =
+            document.getElementById("savingCategory")?.value || "";
+        }
+
+        document.getElementById("hiddenCategory").value = categoryValue;
+        // console.log(document.getElementById("hiddenCategory").value);
+
+        document.getElementById("hiddenDate").value = new Date()
+          .toISOString()
+          .slice(0, 10);
+
+        console.log(
+          "Submitting with date:",
+          document.getElementById("hiddenDate").value
+        );
+
+        let description = "Added via custom form";
+        if (kind === "savings") {
+          description =
+            flowDirection === "cash-out"
+              ? "Saving Withdrawal"
+              : "Saving Deposit";
+          document.getElementById("hiddenFlowDirection").value = flowDirection;
+        } else {
+          document.getElementById("hiddenFlowDirection").value = "";
+        }
+        document.getElementById("hiddenDescription").value = description;
+
+        const container = document.getElementById("dynamicFieldsContainer");
+        container.innerHTML = "";
+
+        peopleYouOwe.forEach((p) => {
+          container.innerHTML += `<input type="hidden" name="ap_persons[]" value="${p.name}">`;
+          container.innerHTML += `<input type="hidden" name="ap_amounts[]" value="${p.amount}">`;
+        });
+
+        peopleWhoOweYou.forEach((p) => {
+          container.innerHTML += `<input type="hidden" name="ar_persons[]" value="${p.name}">`;
+          container.innerHTML += `<input type="hidden" name="ar_amounts[]" value="${p.amount}">`;
+        });
+
+        document.getElementById("cashflowForm").submit();
+      }
+
+      function updateCashflowFormVisibility() {
+        const kindElement = document.getElementById("kind");
+        if (!kindElement) return;
+        const kind = kindElement.value;
+        const incomeSubcat = document.getElementById("income-subcategory");
+        const expenseSubcat = document.getElementById("expense-subcategory");
+        const savingsSubcat = document.getElementById("savings-subcategory");
+        const splitAmountSection = document.getElementById(
+          "split-amount-section"
+        );
+        const dateField = document.getElementById("date-field");
+        const accountNameField = document.getElementById("account-name-field");
+        const repaymentFromGroup = document.getElementById(
+          "repayment-from-group"
+        );
+        const repaymentToGroup = document.getElementById("repayment-to-group");
+        const repaymentCategoryGroup = document.getElementById(
+          "repayment-category-group"
+        );
+
+        // Hide all initially
+        incomeSubcat.style.display = "none";
+        expenseSubcat.style.display = "none";
+        savingsSubcat.style.display = "none";
+        splitAmountSection.style.display = "none";
+        dateField.style.display = "none";
+        accountNameField.style.display = "none";
+        repaymentFromGroup.style.display = "none";
+        repaymentToGroup.style.display = "none";
+        repaymentCategoryGroup.style.display = "none";
+
+        // Set all to unused-category initially
+        document.getElementById("income-category").name = "unused-category";
+        document.getElementById("expense-category").name = "unused-category";
+        document.getElementById("savings-category").name = "unused-category";
+
+        if (kind === "Income") {
+          incomeSubcat.style.display = "block";
+          dateField.style.display = "block";
+          document.getElementById("income-category").name = "category";
+          splitAmountSection.style.display = "block";
+          toggleOtherCategoryInput("income");
+        } else if (kind === "Expense") {
+          expenseSubcat.style.display = "block";
+          dateField.style.display = "block";
+          document.getElementById("expense-category").name = "category";
+          splitAmountSection.style.display = "block";
+          toggleOtherCategoryInput("expense");
+        } else if (kind === "Savings") {
+          savingsSubcat.style.display = "block";
+          dateField.style.display = "block";
+          document.getElementById("savings-category").name = "category";
+          toggleOtherCategoryInput("savings");
+        } else if (kind === "Repayment") {
+          repaymentFromGroup.style.display = "block";
+          repaymentToGroup.style.display = "block";
+          repaymentCategoryGroup.style.display = "block";
+          dateField.style.display = "block";
+        }
+      }
+
+      function toggleOtherCategoryInput(type) {
+        const selectElement = document.getElementById(type + "-category");
+        const otherInput = document.getElementById(type + "-other-category");
+
+        if (selectElement.value === "Other") {
+          otherInput.style.display = "block";
+          otherInput.name = "category";
+          selectElement.name = "unused-category";
+          otherInput.required = true;
+        } else {
+          otherInput.style.display = "none";
+          otherInput.name = "unused-other-category";
+          selectElement.name = "category";
+          otherInput.required = false;
+        }
+      }
+
+      function formatNumber(input) {
+        let value = input.value.replace(/[^\d.]/g, ""); // Allow digits and a single decimal point
+        const parts = value.split(".");
+        let integerPart = parts[0];
+        let decimalPart = parts.length > 1 ? "." + parts[1] : "";
+
+        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        input.value = integerPart + decimalPart;
+      }
+
+      document.querySelector("form").addEventListener("submit", function (e) {
+        const amountInput = document.getElementById("amount");
+        if (amountInput)
+          amountInput.value = amountInput.value.replace(/,/g, "");
+
+        const amountApInput = document.querySelector('input[name="amount_ap"]');
+        if (amountApInput)
+          amountApInput.value = amountApInput.value.replace(/,/g, "");
+
+        const amountArInput = document.querySelector('input[name="amount_ar"]');
+        if (amountArInput)
+          amountArInput.value = amountArInput.value.replace(/,/g, "");
+
+        // Remove unused category fields before submission
+        document
+          .querySelectorAll('[name="unused-category"]')
+          .forEach((field) => field.removeAttribute("name"));
+        document
+          .querySelectorAll('[name="unused-other-category"]')
+          .forEach((field) => field.removeAttribute("name"));
+
+        // Ensure the correct category is submitted
+        const kind = document.getElementById("kind").value;
+        let categoryElement;
+
+        if (kind === "Income") {
+          const incomeSelect = document.getElementById("income-category");
+          const incomeOther = document.getElementById("income-other-category");
+          if (incomeSelect.value === "Other") {
+            categoryElement = incomeOther;
+          } else {
+            categoryElement = incomeSelect;
+          }
+        } else if (kind === "Expense") {
+          const expenseSelect = document.getElementById("expense-category");
+          const expenseOther = document.getElementById(
+            "expense-other-category"
+          );
+          if (expenseSelect.value === "Other") {
+            categoryElement = expenseOther;
+          } else {
+            categoryElement = expenseSelect;
+          }
+        } else if (kind === "Savings") {
+          const savingsSelect = document.getElementById("savings-category");
+          const savingsOther = document.getElementById(
+            "savings-other-category"
+          );
+          if (savingsSelect.value === "Other") {
+            categoryElement = savingsOther;
+          } else {
+            categoryElement = savingsSelect;
+          }
+        }
+        if (categoryElement) {
+          categoryElement.name = "category";
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll(".sidebar-btn").forEach((btn) => {
+          if (btn.getAttribute("href") === currentPath) {
+            btn.classList.add("active");
+          }
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+        updateCashflowFormVisibility();
+      });
+
+      // Function to add new person input field
+      function addPersonField(button) {
+        const currentPersonInputGroup = button.closest(".person-input-group");
+        const parentSection = currentPersonInputGroup.closest(".split-group");
+        const newPersonInputGroup = currentPersonInputGroup.cloneNode(true);
+
+        // Clear the input value in the new clone
+        newPersonInputGroup.querySelector(".person-input").value = "";
+
+        // Change the clicked button to a minus button
+        button.textContent = "-";
+        button.onclick = function () {
+          removePersonField(this);
+        };
+        if (button.classList.contains("ap-add")) {
+          button.classList.remove("ap-add", "btn-primary");
+          button.classList.add("ap-remove", "btn-danger");
+        } else if (button.classList.contains("ar-add")) {
+          button.classList.remove("ar-add", "btn-success");
+          button.classList.add("ar-remove", "btn-danger");
+        }
+
+        // Set the new button to plus
+        const newButton = newPersonInputGroup.querySelector(".btn-add-person");
+        newButton.textContent = "+";
+        newButton.onclick = function () {
+          addPersonField(this);
+        };
+        if (newButton.classList.contains("ap-remove")) {
+          newButton.classList.remove("ap-remove", "btn-danger");
+          newButton.classList.add("ap-add", "btn-primary");
+        } else if (newButton.classList.contains("ar-remove")) {
+          newButton.classList.remove("ar-remove", "btn-danger");
+          newButton.classList.add("ar-add", "btn-success");
+        }
+
+        parentSection.appendChild(newPersonInputGroup);
+      }
+
+      // Function to remove person input field
+      function removePersonField(button) {
+        const currentPersonInputGroup = button.closest(".person-input-group");
+        const parentSection = currentPersonInputGroup.closest(".split-group");
+        currentPersonInputGroup.remove();
+
+        // If the last remaining input group now has a minus button, change it to a plus
+        const remainingInputGroups = parentSection.querySelectorAll(
+          ".person-input-group"
+        );
+        if (remainingInputGroups.length === 1) {
+          const lastButton =
+            remainingInputGroups[0].querySelector(".btn-add-person");
+          lastButton.textContent = "+";
+          lastButton.onclick = function () {
+            addPersonField(this);
+          };
+          if (lastButton.classList.contains("ap-remove")) {
+            lastButton.classList.remove("ap-remove", "btn-danger");
+            lastButton.classList.add("ap-add", "btn-primary");
+          } else if (lastButton.classList.contains("ar-remove")) {
+            lastButton.classList.remove("ar-remove", "btn-danger");
+            lastButton.classList.add("ar-add", "btn-success");
+          }
+        }
+      }
+    </script>
+    <!-- Add required JavaScript files -->
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Theme switching functionality
+      const themeToggle = document.getElementById("themeToggle");
+
+      // Remove no-transition class after page load
+      window.addEventListener("load", () => {
+        document.body.classList.remove("no-transition");
+      });
+
+      // Auto-hide alerts after 3 seconds
+      document.addEventListener("DOMContentLoaded", function () {
+        const alerts = document.querySelectorAll(".alert");
+        alerts.forEach((alert) => {
+          setTimeout(() => {
+            alert.style.opacity = "1";
+            fadeOut(alert);
+          }, 3000);
+        });
+      });
+
+      function fadeOut(element) {
+        let opacity = 1;
+        const fadeEffect = setInterval(() => {
+          if (opacity > 0) {
+            opacity -= 0.1;
+            element.style.opacity = opacity;
+          } else {
+            clearInterval(fadeEffect);
+            element.remove();
+          }
+        }, 50);
+      }
+
+      function toggleTheme() {
+        const body = document.body;
+        if (body.classList.contains("dark-mode")) {
+          body.classList.remove("dark-mode");
+          localStorage.setItem("theme", "light");
+        } else {
+          body.classList.add("dark-mode");
+          localStorage.setItem("theme", "dark");
+        }
+      }
+
+      themeToggle.addEventListener("change", toggleTheme);
+
+      // Check for saved theme preference
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark-mode");
+          themeToggle.checked = true;
+        }
+      });
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

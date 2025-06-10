@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block auth_content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <a href="/"><img src="/static/variors_logo.png" alt="VaRrior Logo" style="height: 130px;"></a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Login to VaRiors</h3>
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
+                            required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Enter password" required />
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <small>Don't have an account? <a href="{{ url_for('auth.sign_up') }}">Sign Up</a></small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

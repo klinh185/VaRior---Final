@@ -1,0 +1,611 @@
+:root {
+  /* Light theme variables */
+  --light-gradient: linear-gradient(135deg, #ffffff, #e6f7f7, #b3ebf2, #0cb9c1);
+  --light-card-bg: rgba(255, 255, 255, 0.9);
+  --light-text: #333;
+  --light-label: #555;
+  --light-border: rgba(0, 141, 165, 0.2);
+  --light-button: #0cb9c1;
+  --light-button-hover: #0bacce;
+  --light-link: #0dcaf0;
+  --light-link-hover: #0bacce;
+  --light-shadow: rgba(0, 0, 0, 0.1);
+  --light-glow: rgba(13, 202, 240, 0.2);
+
+  /* Dark theme variables */
+  --dark-gradient: linear-gradient(135deg, #001e29, #004d5b, #198c9b, #86d2de);
+  --dark-card-bg: rgba(255, 255, 255, 0.9);
+  --dark-text: #004d5b;
+  --dark-label: #006d7c;
+  --dark-border: rgba(0, 141, 165, 0.2);
+  --dark-button: #00889c;
+  --dark-button-hover: #006d7c;
+  --dark-link: #00889c;
+  --dark-link-hover: #00d7ff;
+  --dark-shadow: rgba(0, 215, 255, 0.15);
+  --dark-glow: rgba(0, 255, 255, 0.4);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--light-gradient);
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: "Montserrat", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+  background: var(--dark-gradient);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Theme switcher styles */
+.theme-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: 0.4s;
+  border-radius: 34px;
+  border: 1px solid rgba(0, 141, 165, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 3px;
+  background-color: var(--light-button);
+  transition: 0.4s;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "FontAwesome";
+  color: white;
+  font-size: 14px;
+}
+
+.dark-mode .slider {
+  background-color: #004d5b;
+  border-color: rgba(0, 215, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 215, 255, 0.2);
+}
+
+.dark-mode .slider:before {
+  background-color: var(--dark-button);
+  transform: translateX(26px);
+}
+
+.slider:after {
+  content: "☀️";
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font-size: 14px;
+}
+
+.dark-mode .slider:after {
+  content: "🌙";
+}
+
+.login-container,
+.signup-container {
+  margin-top: 20px;
+}
+
+.login-card,
+.signup-card {
+  border-radius: 24px;
+  box-shadow: 0 8px 32px var(--light-shadow);
+  background: var(--light-card-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.dark-mode .login-card,
+.dark-mode .signup-card {
+  box-shadow: 0 8px 32px var(--dark-shadow);
+}
+
+.login-card .card-body,
+.signup-card .card-body {
+  padding: 20px 32px;
+}
+
+.login-logo {
+  margin-bottom: 16px;
+  transition: transform 0.3s ease;
+}
+
+.login-logo img {
+  height: 90px !important;
+  filter: drop-shadow(0 0 15px var(--light-glow));
+  transition: filter 0.3s ease;
+}
+
+.dark-mode .login-logo img {
+  filter: drop-shadow(0 0 15px var(--dark-glow));
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 15px var(--dark-glow));
+  }
+
+  to {
+    filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.7));
+  }
+}
+
+.login-logo:hover {
+  transform: scale(1.05);
+}
+
+.login-title,
+.card-title {
+  color: var(--light-text);
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .login-title,
+.dark-mode .card-title {
+  color: var(--dark-text);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  color: var(--light-label);
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .form-group label {
+  color: var(--dark-label);
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--light-border);
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark-mode .form-control {
+  border-color: var(--dark-border);
+}
+
+.form-control:focus {
+  border-color: var(--light-link);
+  box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.2);
+}
+
+.dark-mode .form-control:focus {
+  border-color: var(--dark-link);
+  box-shadow: 0 0 0 3px rgba(0, 215, 255, 0.2);
+}
+
+.btn-primary {
+  background-color: var(--light-button);
+  border-color: var(--light-button);
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .btn-primary {
+  background-color: var(--dark-button);
+  border-color: var(--dark-button);
+  box-shadow: 0 2px 8px rgba(0, 215, 255, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--light-button-hover);
+  border-color: var(--light-button-hover);
+  transform: translateY(-1px);
+}
+
+.dark-mode .btn-primary:hover {
+  background-color: var(--dark-button-hover);
+  border-color: var(--dark-button-hover);
+  box-shadow: 0 4px 12px rgba(0, 215, 255, 0.3);
+}
+
+.signup-link {
+  color: var(--light-link);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.dark-mode .signup-link {
+  color: var(--dark-link);
+}
+
+.signup-link:hover {
+  color: var(--light-link-hover);
+}
+
+.dark-mode .signup-link:hover {
+  color: var(--dark-link-hover);
+}
+
+.mt-4 {
+  margin-top: 1rem !important;
+}
+
+.mt-3 {
+  margin-top: 0.75rem !important;
+}
+
+/* Add these styles for the sidebar logo and adjust spacing */
+.sidebar-header {
+  padding: 8px;
+  background: #2c3136;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-header img {
+  height: 45px !important;
+  width: auto;
+  display: block;
+  margin: 0;
+}
+
+/* First button after logo */
+.sidebar-btn:first-of-type {
+  margin-top: 4px;
+}
+
+.sidebar-btn {
+  width: 90%;
+  margin: 4px auto;
+  display: block;
+  padding: 12px 15px;
+  text-align: left;
+  border-radius: 5px;
+  color: white;
+  background-color: #495057;
+  border: none;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Chart container styles */
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  height: 300px;
+  padding: 15px;
+}
+
+/* Specific chart styles */
+#expensePieChart {
+  max-height: 250px !important;
+  /* Force smaller height */
+}
+
+#monthlyExpensesChart {
+  max-height: 250px !important;
+}
+
+.card {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 141, 165, 0.1);
+}
+
+.dark-mode .card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 215, 255, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 141, 165, 0.15);
+}
+
+.dark-mode .card:hover {
+  box-shadow: 0 10px 40px rgba(0, 215, 255, 0.15);
+}
+
+/* Make sure content is above the fixed background */
+.wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  color: var(--light-text);
+  transition: color 0.3s ease;
+}
+
+.dark-mode h1 {
+  color: #ffffff;
+}
+
+/* Remove transition on page load */
+.no-transition * {
+  transition: none !important;
+}
+
+/* Modal styles */
+.modal-open {
+  overflow: hidden;
+  padding-right: 0 !important;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop {
+  display: none !important;
+}
+
+.modal-content {
+  background: #fff;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .modal-content {
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 215, 255, 0.2);
+}
+
+/* Fix for multiple backdrop issue */
+body:not(.modal-open) {
+  padding-right: 0 !important;
+}
+
+.dark-mode .card-title {
+  color: var(--dark-text);
+}
+
+.theme-dependent-title {
+  color: black;
+}
+
+.dark-mode .theme-dependent-title {
+  color: white;
+}
+
+/* Cashflow Table Specific Styles */
+.cashflow-date-col {
+  width: 12%;
+}
+
+.cashflow-amount-col {
+  width: 23%;
+}
+
+.cashflow-type-col {
+  width: 10%;
+}
+
+.cashflow-category-col {
+  width: 20%;
+}
+
+.cashflow-payment-method-col {
+  width: 15%;
+}
+
+.cashflow-action-col {
+  width: 20%;
+}
+
+.outstanding-summary-section,
+.outstanding-user-cards-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.outstanding-summary-card {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 15px;
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.outstanding-user-card {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 15px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: box-shadow 0.3s ease;
+  border-radius: 6px;
+}
+
+.outstanding-user-card:hover {
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
+
+.outstanding-user-card h5 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.outstanding-user-card p {
+  font-size: 1.05em;
+  margin: 6px 0;
+}
+
+.outstanding-user-card button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: none;
+}
+
+.outstanding-user-card:hover button {
+  display: block;
+}
+
+.outstanding-net-negative {
+  color: red;
+}
+
+.outstanding-net-positive {
+  color: green;
+}
+
+.outstanding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.outstanding-transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.outstanding-transaction-table th,
+.outstanding-transaction-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.outstanding-transaction-table th {
+  background-color: #e9ecef;
+}
+
+.outstanding-relative-container {
+  position: relative;
+}
+
+#outstanding-transaction-table-container {
+  display: none;
+  margin-top: 30px;
+}
+
+.emergency-card-title {
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#add-scenario-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#scenarios-holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  text-align: center;
+  border-radius: 15px;
+  border-style: dashed;
+  border-color: grey;
+}
+
+.scenarios-label {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.scenario-row {
+  align-items: end;
+}
+
+.scenario-input {
+  height: 40px;
+}
+
+.trash-btn {
+  height: 40px !important;
+  width: 40px !important;
+}
+
+.scenario-accordion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scenario-accordion-title {
+  color: grey;
+}
+
+#scenarios-list hr {
+  margin-top: 0;
+  margin-bottom: 0;
+}

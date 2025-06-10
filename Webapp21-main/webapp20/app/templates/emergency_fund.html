@@ -1,0 +1,625 @@
+{% extends "base.html" %} {% block title %}Emergency Fund Calculator{% endblock
+%} {% block content %}
+<div class="container mt-4">
+  <!-- Logic Jinja2 để quyết định view nào được hiển thị mặc định -->
+  {% set initial_view = 'dashboard' if active_goal else 'selection' %}
+
+  <!-- =============================================================== -->
+  <!-- VIEW 1: SELECTION (hiển thị khi chưa có mục tiêu) -->
+  <!-- =============================================================== -->
+  <div
+    id="selection-view"
+    {%
+    if
+    initial_view
+    !="selection"
+    %}style="display: none;"
+    {%
+    endif
+    %}
+  >
+    <div class="text-center">
+      <h1>Emergency Fund Calculator</h1>
+      <p class="lead">
+        Estimate how much money you need to set aside for emergencies.
+      </p>
+    </div>
+    <!-- Thêm các thẻ thông tin What/Why/How much như trong ảnh -->
+    <h3 class="text-center mt-5">Choose Your Calculator Type</h3>
+    <div class="row mt-3">
+      <div class="col-md-6 mb-3">
+        <div
+          class="card h-100 calculator-choice"
+          data-type="simple"
+          style="cursor: pointer"
+        >
+          <div class="card-body">
+            <h5 class="card-title">Type A: Simple Emergency Fund</h5>
+            <ul>
+              <li>Quick calculation</li>
+              <li>Based on monthly expenses</li>
+              <li>Perfect for beginners</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div
+          class="card h-100 calculator-choice"
+          data-type="customized"
+          style="cursor: pointer"
+        >
+          <div class="card-body">
+            <h5 class="card-title">Type B: Customized Emergency Fund</h5>
+            <ul>
+              <li>Detailed scenario planning</li>
+              <li>Customizable emergency types</li>
+              <li>Frequency-based calculations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================================== -->
+  <!-- VIEW 2: CALCULATOR (ban đầu luôn ẩn, JS sẽ điền nội dung) -->
+  <!-- =============================================================== -->
+  <div id="calculator-view" style="display: none"></div>
+
+  <!-- =============================================================== -->
+  <!-- VIEW 3: DASHBOARD (hiển thị khi đã có mục tiêu) -->
+  <!-- =============================================================== -->
+  <div
+    id="dashboard-view"
+    {%
+    if
+    initial_view
+    !="dashboard"
+    %}style="display: none;"
+    {%
+    endif
+    %}
+  >
+    <h3>Your Emergency Fund Goal</h3>
+    {% if active_goal %}
+    <div class="alert alert-success fs-4">
+      Target:
+      <strong>{{ '{:,.0f}'.format(active_goal.target_amount) }} ₫</strong>
+    </div>
+    <p>
+      This goal was set using the
+      <strong>'{{ active_goal.calculation_type }}'</strong> method.
+    </p>
+    <p>
+      Current Savings:
+      <strong>{{ '{:,.0f}'.format(active_goal.current_savings) }} ₫</strong>
+    </p>
+    <p>
+      Monthly Contribution:
+      <strong
+        >{{ '{:,.0f}'.format(active_goal.monthly_contribution) }} ₫</strong
+      >
+    </p>
+    <button id="recalculate-btn" class="btn btn-primary">
+      Recalculate or Change Plan
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- =============================================================== -->
+  <!-- VIEW 4: PLAN (hiển thị sau khi Save and Plan) -->
+  <!-- =============================================================== -->
+  <div id="plan-view" style="display: none">
+    <div class="container mt-5" style="max-width: 800px">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h3 class="mb-2" style="font-weight: 600">
+            <i class="fa fa-shield"></i> Your Emergency Fund Plan is Ready!
+          </h3>
+          <div class="text-muted mb-4">Review your plan summary</div>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="p-3" style="background: #f8fafc; border-radius: 12px">
+                <h5 class="mb-3" style="font-weight: 600">Plan Summary</h5>
+                <div class="mb-2">Emergency Type: <b>General Emergency</b></div>
+                <div class="mb-2">
+                  Target Amount: <b id="target-amount">0 VND</b>
+                </div>
+                <div class="mb-2">
+                  Current Savings:
+                  <input
+                    type="number"
+                    id="current-savings"
+                    class="form-control d-inline-block"
+                    style="width: 140px; display: inline-block"
+                    min="0"
+                    value="0"
+                  />
+                  VND
+                </div>
+                <div class="mb-2">
+                  Monthly Saving:
+                  <input
+                    type="number"
+                    id="monthly-contribution"
+                    class="form-control d-inline-block"
+                    style="width: 140px; display: inline-block"
+                    min="0"
+                    value="0"
+                  />
+                  VND
+                </div>
+                <div class="mb-2">
+                  Time to Goal: <b id="months-to-goal">0 months</b>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3" style="background: #f8fafc; border-radius: 12px">
+                <h5 class="mb-3" style="font-weight: 600">
+                  <i class="fa fa-lightbulb-o"></i> Quick Tips
+                </h5>
+                <ul class="mb-0" style="font-size: 1rem">
+                  <li>Set up automatic transfers to your emergency fund</li>
+                  <li>
+                    Keep your emergency fund in a separate savings account
+                  </li>
+                  <li>Review and adjust your plan every 6 months</li>
+                  <li>Only use it for true emergencies</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button class="btn btn-outline-secondary" id="previous-btn">
+          &larr; Previous
+        </button>
+        <button class="btn btn-primary" id="save-plan-btn">
+          <i class="fa fa-save"></i> Save Plan & Return Home
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  function formatVND(num) {
+    if (!num || isNaN(num)) return "0 ₫";
+    return Number(num).toLocaleString("vi-VN") + " ₫";
+  }
+
+  let emergencyFundGoal = {};
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const selectionView = document.getElementById("selection-view");
+    const calculatorView = document.getElementById("calculator-view");
+    const dashboardView = document.getElementById("dashboard-view");
+
+    function showView(viewId) {
+      [
+        "selection-view",
+        "calculator-view",
+        "dashboard-view",
+        "plan-view",
+      ].forEach((id) => {
+        document.getElementById(id).style.display = "none";
+      });
+      document.getElementById(viewId).style.display = "block";
+    }
+
+    document.querySelectorAll(".calculator-choice").forEach((card) => {
+      card.addEventListener("click", function () {
+        const type = this.dataset.type;
+        buildCalculatorForm(type);
+        showView("calculator-view");
+      });
+    });
+
+    const recalculateBtn = document.getElementById("recalculate-btn");
+    if (recalculateBtn) {
+      recalculateBtn.addEventListener("click", () =>
+        showView("selection-view")
+      );
+    }
+
+    function buildCalculatorForm(type) {
+      let formHTML = "";
+      if (type === "simple") {
+        formHTML = `
+            <div class="simple-calc-container" style="max-width:900px;margin:auto;">
+                <div class="text-center mb-3">
+                    <h2><i class="fa fa-calculator"></i> Simple Emergency Fund Calculator</h2>
+                    <div class="text-muted">Calculate your emergency fund based on months of essential expenses</div>
+                    <div class="text-info mt-2" style="font-size:1rem;">Recommendation: This amount should cover your essential expenses. Start building this fund gradually and keep it in an easily accessible savings account.</div>
+                </div>
+                <div class="row g-4 align-items-start">
+                    <div class="col-md-6">
+                        <div class="card p-4 mb-3">
+                            <h5>Your Information</h5>
+                            <div class="form-group mb-3">
+                                <label for="months-to-cover">Number of Months to Cover <span title="Enter a number between 3 and 6 months">&#9432;</span></label>
+                                <input type="number" id="months-to-cover" class="form-control" min="3" max="6" value="3" required>
+                                <small class="text-muted">Enter a number between 3 and 6 months</small>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="monthly-expense">Monthly Essential Expenses (VND) <span title="Your average monthly essential spending">&#9432;</span></label>
+                                <input type="number" id="monthly-expense" class="form-control" placeholder="VND 5000000" required>
+                            </div>
+                            </div>
+                            </div>
+                    <div class="col-md-6">
+                        <div class="card p-4 mb-3">
+                            <h5><i class="fa fa-calculator"></i> Your Emergency Fund Calculation</h5>
+                            <div class="mb-2" id="formula-box" style="background:#f4f6fb;padding:12px;border-radius:8px;">
+                                <b>Formula:</b><br>
+                                Emergency Fund = Monthly Expenses × Number of Months<br>
+                                <span id="formula-detail" style="color:#2563eb;font-weight:500;">= ...</span>
+                            </div>
+                            <div id="result-box" class="text-center" style="background:#e6f9ed;border-radius:8px;padding:18px 0;margin-bottom:10px;">
+                                <div style="font-size:1.1rem;">Your Simple Emergency Fund Estimate:</div>
+                                <div id="result-amount" style="font-size:2rem;font-weight:700;color:#1db954;">0 ₫</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-outline-secondary" id="change-type-btn">&larr; Change Calculator Type</button>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="button" class="btn btn-success" id="save-goal-btn">Save and Plan</button>
+                        <button type="button" class="btn btn-secondary" id="back-dashboard-btn">Back to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .simple-calc-container input[type=number]::-webkit-inner-spin-button,
+                .simple-calc-container input[type=number]::-webkit-outer-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+                .simple-calc-container input[type=number] {
+                    appearance: textfield;
+                }
+            </style>
+            `;
+      } else {
+        // type === 'customized'
+        formHTML = `
+              <div class="simple-calc-container" style="max-width:900px;margin:auto;">
+                <div class="text-center mb-3">
+                  <h2><i class="fa fa-calculator"></i> Customized Emergency Fund Calculator</h2>
+                  <div class="text-muted">Calculate your emergency fund based on months of possible emergencies</div>
+                  <div class="text-info mt-2" style="font-size:1rem;">Note: The average expense estimates for emergency scenarios shown
+                    are generated by OpenAI's GPT-4.1-mini model with search-based engine. While we aim to reflect real-time data through regular updates,
+                    these figures are illustrative examples only and should not be considered financial, medical, or professional advice.</div>
+                </div>
+                <div class="card p-4">
+                  <div class="emergency-card-title mb-3">
+                    <h5>Emergency Scenarios</h5>
+                    <button type="button" id="add-scenario-btn" class="btn btn-info btn-sm mb-2 py-2 px-3">
+                      <i class="fa fa-plus"></i> Add Scenario
+                    </button>
+                  </div>
+                  <div id="scenarios-list">
+                    <div id="scenarios-holder" class="p-4">Click "Add Scenario" to start planning your emergency fund</div>
+                  </div>
+                </div>
+
+                <button type="button" id="save-goal-btn" class="btn btn-success mt-3">Save Goal</button>
+                <button type="button" class="btn btn-secondary mt-3 back-to-selection">Back</button>
+              </div>
+            `;
+      }
+      calculatorView.innerHTML = formHTML;
+      addCalculatorEventListeners(type);
+    }
+
+    function addCalculatorEventListeners(type) {
+      if (type === "simple") {
+        const monthsInput = document.getElementById("months-to-cover");
+        const expenseInput = document.getElementById("monthly-expense");
+        const formulaDetail = document.getElementById("formula-detail");
+        const resultAmount = document.getElementById("result-amount");
+        function updateCalculation() {
+          let months = parseInt(monthsInput.value) || 0;
+          let expense = parseInt(expenseInput.value) || 0;
+          let total = months * expense;
+          formulaDetail.textContent = `= ${formatVND(expense)} × ${months}`;
+          resultAmount.textContent = formatVND(total);
+        }
+        monthsInput.addEventListener("input", updateCalculation);
+        expenseInput.addEventListener("input", updateCalculation);
+        updateCalculation();
+        document.getElementById("change-type-btn").onclick = () =>
+          showView("selection-view");
+        document.getElementById("back-dashboard-btn").onclick = () =>
+          showView("dashboard-view");
+        document.getElementById("save-goal-btn").onclick = function () {
+          let payload = {
+            type: "simple",
+            months: monthsInput.value,
+            monthly_expense: expenseInput.value,
+          };
+          fetch("/save-emergency-fund-goal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success) {
+                alert(data.message);
+                showPlanView(data.goal_id, data.target_amount);
+              } else {
+                alert("Error: " + data.error);
+              }
+            });
+        };
+      } else if (type === "customized") {
+        document
+          .querySelector(".back-to-selection")
+          .addEventListener("click", () => showView("selection-view"));
+        document
+          .getElementById("save-goal-btn")
+          .addEventListener("click", () => handleSaveGoal(type));
+        document
+          .getElementById("add-scenario-btn")
+          .addEventListener("click", addScenarioRow);
+        addScenarioRow();
+      }
+    }
+
+    function addScenarioRow() {
+      const outer = document.createElement("div");
+      outer.className = "card scenario-card mb-4 p-4";
+
+      const div = document.createElement("div");
+      div.className = "row mb-2 scenario-row";
+      div.innerHTML = `
+          <div class="col-md-3 pr-0">
+            <p class="scenarios-label mb-1">Emergency Type</p>
+            <select class="scenario-input form-control scenario-name" aria-label="Emergency Type">
+              <option selected>Select type</option>
+              <option value="1">Job Loss</option>
+              <option value="2">Medical Emergency</option>
+              <option value="3">Personal Asset</option>
+              <option value="4">Dependents</option>
+            </select>
+          </div>
+          <div class="col-md-3 pr-0">
+            <p class="scenarios-label mb-1">Location</p>
+            <select class="scenario-input form-control scenario-location" aria-label="Location">
+              <option selected>Select location</option>
+              <option value="1">Vietnam</option>
+              <option value="2">Finland</option>
+              <option value="3">Japan</option>
+            </select>
+          </div>
+          <div class="col-md-3 pr-0">
+            <p class="scenarios-label mb-1">Amount You'll Cover (VND)</p>
+            <input type="text" class="form-control scenario-input scenario-expense" placeholder="Amount">
+          </div>
+          <div class="col-md-2 pr-0">
+            <p class="scenarios-label mb-1">Frequency (yearly)</p>
+            <input type="number" class="form-control scenario-input scenario-frequency" value="1" placeholder="Frequency">
+          </div>
+          <div class="col-md-1">
+              <button type="button" class="remove-scenarios btn btn-danger btn-sm trash-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+          </div>
+        `;
+
+      outer.appendChild(div);
+
+      const placeholder = document.getElementById("scenarios-holder");
+      if (placeholder) document.getElementById("scenarios-holder").remove();
+      document.getElementById("scenarios-list").appendChild(outer);
+
+      const typeSelect = div.querySelector(".scenario-name");
+      const locationSelect = div.querySelector(".scenario-location");
+
+      typeSelect.addEventListener("change", () =>
+        maybeFetchAndAppendDetails(typeSelect, locationSelect, outer)
+      );
+      locationSelect.addEventListener("change", () =>
+        maybeFetchAndAppendDetails(typeSelect, locationSelect, outer)
+      );
+    }
+
+    async function maybeFetchAndAppendDetails(
+      typeSelect,
+      locationSelect,
+      outer
+    ) {
+      const existedDiv = outer.querySelector(".scenario-accordion-full");
+      if (existedDiv) existedDiv.remove();
+
+      const loadingDiv = document.createElement("div");
+      loadingDiv.innerHTML = `Loading expenses...`;
+
+      const type = typeSelect.options[typeSelect.selectedIndex].text;
+      const location =
+        locationSelect.options[locationSelect.selectedIndex].text;
+
+      if (
+        typeSelect.selectedIndex !== 0 &&
+        locationSelect.selectedIndex !== 0
+      ) {
+        outer.appendChild(loadingDiv);
+        console.log(type, location);
+        const resultFromOpenAI = await fetchDataFromOpenAI(type, location);
+        console.log(resultFromOpenAI);
+
+        const responseDiv = JSON.parse(resultFromOpenAI).scenarios.map(
+          (obj, idx) => {
+            return `
+            <div class="scenario-accordion px-4 mt-4">
+              <p class="mb-2">${obj.name}</p>
+              <p class="mb-2">${obj.expense} đ</p>
+            </div>
+            ${idx !== resultFromOpenAI.length - 1 && `<hr/>`}
+          `;
+          }
+        );
+
+        const expandDiv = document.createElement("div");
+
+        expandDiv.innerHTML =
+          `
+            <div class="scenario-accordion-full">
+            <h6 class="my-3">Average Emergency Expenses - Job Loss </h6>
+            <div class="scenario-accordion scenario-accordion-title px-4 mt-4">
+              <p class="mb-2">Scenarios</p>
+              <p class="mb-2">Average Expense</p>
+            </div>
+            <hr/>
+        ` +
+          responseDiv.join("") +
+          "</div>";
+
+        loadingDiv.remove();
+        outer.appendChild(expandDiv);
+        console.log("it ran");
+      }
+    }
+
+    function removeScenarioCard(event) {
+      const cardToRemove = event.target.closest(".scenario-card");
+      if (cardToRemove) {
+        cardToRemove.remove();
+      }
+
+      const scenariosList = document.getElementById("scenarios-list");
+      const scenariosHolder = document.getElementById("scenarios-holder");
+      const scenarioCards = document.querySelectorAll(".scenario-card");
+
+      if (!scenarioCards.length && !scenariosHolder) {
+        const placeholder = document.createElement("div");
+        placeholder.innerHTML = `<div id="scenarios-holder" class="p-4">Click "Add Scenario" to start planning your emergency fund</div>`;
+        scenariosList.appendChild(placeholder);
+      }
+    }
+
+    function handleSaveGoal(type) {
+      let payload = { type: type };
+      if (type === "simple") {
+        payload.months = document.getElementById("months-to-cover").value;
+        payload.monthly_expense =
+          document.getElementById("monthly-expense").value;
+      } else {
+        // customized
+        payload.scenarios = [];
+        document.querySelectorAll(".scenario-row").forEach((row) => {
+          payload.scenarios.push({
+            name: row.querySelector(".scenario-name").value,
+            expense_covered: row.querySelector(".scenario-expense").value,
+            frequency: row.querySelector(".scenario-frequency").value,
+          });
+        });
+      }
+      fetch("/save-emergency-fund-goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert(data.message);
+            showPlanView(data.goal_id, data.target_amount);
+          } else {
+            alert("Error: " + data.error);
+          }
+        });
+    }
+
+    const fetchDataFromOpenAI = async (type, location) => {
+      const data = await fetch("/get-openai-emergency-expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, location }),
+      });
+      return data.json();
+    };
+
+    // --- PLAN VIEW LOGIC ---
+    let planTargetAmount = 0;
+    let planGoalId = null;
+    function showPlanView(goalId, targetAmount) {
+      planTargetAmount = targetAmount;
+      planGoalId = goalId;
+      document.getElementById("target-amount").textContent =
+        formatVND(planTargetAmount);
+      document.getElementById("current-savings").value = 0;
+      document.getElementById("monthly-contribution").value = 0;
+      document.getElementById("months-to-goal").textContent = "0 months";
+      [
+        "selection-view",
+        "calculator-view",
+        "dashboard-view",
+        "plan-view",
+      ].forEach((id) => {
+        document.getElementById(id).style.display = "none";
+      });
+      document.getElementById("plan-view").style.display = "block";
+    }
+
+    // Attach event listeners for plan view
+    document.addEventListener("click", function (event) {
+      const removeButton = event.target.closest(".remove-scenarios");
+      if (removeButton) {
+        console.log("here");
+        removeScenarioCard(event);
+      }
+    });
+
+    document.addEventListener("input", function (e) {
+      if (
+        e.target &&
+        (e.target.id === "current-savings" ||
+          e.target.id === "monthly-contribution")
+      ) {
+        const current =
+          parseInt(document.getElementById("current-savings").value) || 0;
+        const monthly =
+          parseInt(document.getElementById("monthly-contribution").value) || 0;
+        let months = 0;
+        if (monthly > 0 && planTargetAmount > current) {
+          months = Math.ceil((planTargetAmount - current) / monthly);
+        }
+        document.getElementById("months-to-goal").textContent =
+          months + " months";
+      }
+    });
+
+    document.getElementById("save-plan-btn").onclick = function () {
+      const current = document.getElementById("current-savings").value;
+      const monthly = document.getElementById("monthly-contribution").value;
+      fetch("/save-fund-roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          goal_id: planGoalId,
+          current_savings: current,
+          monthly_contribution: monthly,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert(data.message);
+            window.location.href = "/dashboard";
+          } else {
+            alert("Error: " + data.error);
+          }
+        });
+    };
+    document.getElementById("previous-btn").onclick = function () {
+      showView("calculator-view");
+    };
+  });
+</script>
+{% endblock %}

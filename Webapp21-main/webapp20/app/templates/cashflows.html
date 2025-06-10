@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block title %}Cashflows{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4 theme-dependent-title">Cash Flows</h1>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="monthFilter" class="mr-2">Filter by Month:</label>
+                    <form method="GET" action="{{ url_for('views.cashflows') }}">
+                        <div class="input-group" style="max-width: 300px;">
+                            <select name="month" id="month" class="form-select form-control"
+                                onchange="this.form.submit()">
+                                {% for month_option in month_options %}
+                                <option value="{{ month_option }}" {% if month_option==month %}selected{% endif %}>
+                                    {% if month_option == 'all' %}
+                                    All Transactions
+                                    {% else %}
+                                    {{ datetime.strptime(month_option, '%Y-%m').strftime('%B %Y') }}
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                {% if cashflows %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th data-field="date" class="cashflow-date-col">Date</th>
+                                <th data-field="amt" class="cashflow-amount-col">Amount</th>
+                                <th data-field="type" class="cashflow-type-col">Type</th>
+                                <th data-field="cat" class="cashflow-category-col">Category</th>
+                                <th data-field="action" class="cashflow-action-col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for txn in cashflows %}
+                            <tr id="cashflow-{{ txn.id }}">
+                                <td class="cashflow-date-col">{{ txn.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="cashflow-amount-col" style="padding-left: 20px;">
+                                    {% if txn.kind == 'Expense' %}
+                                    <span style="color: black;">{{ "{:,.0f}".format(txn.amount) }} VND</span>
+                                    {% elif txn.kind == 'Income' %}
+                                    <span style="color: black;">{{ "{:,.0f}".format(txn.amount) }} VND</span>
+                                    {% else %}
+                                    <span style="color: black;">{{ "{:,.0f}".format(txn.amount) }} VND</span>
+                                    {% endif %}
+                                </td>
+                                <td class="cashflow-type-col" style="padding-left: 15px;">
+                                    {% if txn.kind == 'Income' %}
+                                    <span style="color: green;">{{ txn.kind }}</span>
+                                    {% elif txn.kind == 'Expense' %}
+                                    <span style="color: red;">{{ txn.kind }}</span>
+                                    {% else %}
+                                    <span style="color: #FFD700;">{{ txn.kind }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="cashflow-category-col">{{ txn.category }}</td>
+                                <td class="cashflow-action-col" style="text-align: center;">
+                                    <button class="btn btn-sm btn-primary"
+                                        onclick="editTransaction({{ txn.id }}, '{{ txn.date.strftime('%Y-%m-%d') }}', {{ txn.amount }}, '{{ txn.category }}', '{{ txn.account_name }}')">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteCashflow({{ txn.id }})">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No transactions found for {{ month.replace('-', ' ') }}.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Transaction Modal -->
+<div class="modal fade" id="editTransactionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editTransactionForm" method="POST" action="{{ url_for('views.edit_cashflow') }}">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_cashflow_id" name="cashflow_id">
+
+                    <div class="form-group">
+                        <label for="edit_amount">Amount:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">VND</span>
+                            </div>
+                            <input type="text" class="form-control" id="edit_amount" name="amount" required
+                                oninput="formatNumber(this)" pattern="[0-9,]*" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_date">Date:</label>
+                        <input type="date" class="form-control" id="edit_date" name="date" required>
+                    </div>
+
+                    <div class="form-group" id="edit-category-group">
+                        <label for="edit_category">Category:</label>
+                        <select class="form-control" id="edit_category" name="category" required>
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="edit-account-name-group" style="display: none;">
+                        <label id="edit_account_name_label" for="edit_account_name">Owner Name:</label>
+                        <input type="text" class="form-control" id="edit_account_name" name="account_name">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /*
+    function toggleSubcategory() {
+        const kind = document.getElementById("kind").value;
+        const incomeSubcat = document.getElementById("income-subcategory");
+        const expenseSubcat = document.getElementById("expense-subcategory");
+
+        incomeSubcat.style.display = "none";
+        expenseSubcat.style.display = "none";
+
+        if (kind === "Income") {
+            incomeSubcat.style.display = "block";
+        } else if (kind === "Expense") {
+            expenseSubcat.style.display = "block";
+        }
+    }
+    */
+
+    function editTransaction(id, date, amount, category, accountName) {
+        // Set form values
+        document.getElementById('edit_cashflow_id').value = id;
+        document.getElementById('edit_date').value = date;
+        document.getElementById('edit_amount').value = amount.toLocaleString();
+        document.getElementById('edit_category').value = category;
+        document.getElementById('edit_account_name').value = accountName;
+
+        // Show/hide and update label for account name based on payment method
+        const accountNameGroup = document.getElementById('edit-account-name-group');
+        const accountNameLabel = document.getElementById('edit_account_name_label');
+        const accountNameInput = document.getElementById('edit_account_name');
+        const categoryGroup = document.getElementById('edit-category-group');
+
+            accountNameGroup.style.display = 'block';
+            accountNameInput.required = true;
+            categoryGroup.style.display = 'block';
+            document.getElementById('edit_category').required = true;
+        accountNameLabel.textContent = 'Owner Name:';
+
+        // Show modal
+        $('#editTransactionModal').modal('show');
+    }
+
+    function formatNumber(input) {
+        var num = input.value.replace(/[^\d]/g, '');
+        input.value = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // Handle edit form submission
+    document.getElementById('editTransactionForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Remove commas from amount before submitting
+        const amountInput = document.getElementById('edit_amount');
+        if (amountInput) {
+            const originalValue = amountInput.value;
+            amountInput.value = originalValue.replace(/,/g, '');
+            console.log('Edit form - Original amount:', originalValue);
+            console.log('Edit form - Formatted amount:', amountInput.value);
+        }
+
+        // Submit form
+        this.submit();
+    });
+
+    function deleteCashflow(cashflowId) {
+        if (confirm('Are you sure you want to delete this cashflow?')) {
+            fetch('{{ url_for('views.delete_cashflow') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cashflowId: cashflowId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the row from the table
+                        document.getElementById(`cashflow-${cashflowId}`).remove();
+                        // Show success message
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show';
+                        alert.innerHTML = `
+                        Cashflow deleted successfully!
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    `;
+                        // Find the container to insert the alert into. Adjust selector if needed.
+                        const container = document.querySelector('.container-fluid') || document.querySelector('.container');
+                        if (container) {
+                            container.insertBefore(alert, container.firstChild);
+                        }
+                        // Optional: reload the page after successful deletion
+                        // window.location.reload();
+
+                    } else {
+                        throw new Error(data.error || 'Failed to delete cashflow');
+                    }
+                })
+                .catch(error => {
+                    // Show error message
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-danger alert-dismissible fade show';
+                    alert.innerHTML = `
+                    Error deleting cashflow: ${error.message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                `;
+                    // Find the container to insert the alert into. Adjust selector if needed.
+                    const container = document.querySelector('.container-fluid') || document.querySelector('.container');
+                    if (container) {
+                        container.insertBefore(alert, container.firstChild);
+                    }
+                });
+        }
+    }
+
+    function filterByMonth(selectedMonth) {
+        window.location.href = `/cashflows?month=${selectedMonth}`;
+        return false;
+    }
+</script>
+{% endblock %}

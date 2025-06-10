@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block title %}Outstanding Transactions{% endblock
+%} {% block content %}
+<div class="outstanding-header">
+  <h1>Debt and Loan</h1>
+  <div class="outstanding-summary-section">
+    <div class="outstanding-summary-card">
+      <strong>Total Owed</strong><br />
+      <span>VND {{ total_payable }}</span>
+    </div>
+    <div class="outstanding-summary-card">
+      <strong>Total Lent</strong><br />
+      <span>VND {{ total_receivable }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="outstanding-user-cards-section">
+  {% for item in payables %}
+  <div class="outstanding-summary-card outstanding-user-card">
+    <h5>{{ item.person_name }}</h5>
+    <p>Amount owed: VND {{ item.amount }}</p>
+    <p class="net-negative">Net balance: VND -{{ item.amount }}</p>
+    <button onclick="showTransactions('{{ item.person_name }}')">
+      View Transactions
+    </button>
+  </div>
+  {% endfor %} {% for item in receivables %}
+  <div class="outstanding-summary-card outstanding-user-card">
+    <h5>{{ item.person_name }}</h5>
+    <p>Amount lent: VND {{ item.amount }}</p>
+    <p class="net-positive">Net balance: VND {{ item.amount }}</p>
+    <button onclick="showTransactions('{{ item.person_name }}')">
+      View Transactions
+    </button>
+  </div>
+  {% endfor %}
+</div>
+
+<div
+  id="outstanding-transaction-table-container"
+  class="outstanding-transaction-table outstanding-relative-container"
+>
+  <table class="outstanding-transaction-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Owed/Lent</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="4">No transactions selected.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function showTransactions(personId) {
+    fetch(`/get-transactions/${personId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const tableBody = document.querySelector(
+          ".outstanding-transaction-table tbody"
+        );
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        if (data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="4">No transactions found.</td></tr>`;
+        } else {
+          data.forEach((tx) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${tx.date}</td>
+              <td>VND ${tx.amount.toFixed(2)}</td>
+              <td>${tx.type}</td>
+              <td>${tx.note}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
+
+        document.getElementById(
+          "outstanding-transaction-table-container"
+        ).style.display = "block";
+      })
+      .catch((error) => {
+        console.error("Error loading transactions:", error);
+      });
+  }
+</script>
+{% endblock %}
