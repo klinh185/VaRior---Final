@@ -60,6 +60,10 @@ To run the application in development mode:
    ```bash
    python main.py
    ```
+## Live Data Integration
+Customized Emergency Fund module uses ChatGPT API (via OpenAI) to dynamically fetch cost-of-living estimates for selected emergency scenarios by country or region. 
+However, the current GitHub source code does not include the API key for ChatGPT integration, due to security and usage policy restrictions.
+Anyone deploying the system must **obtain their own OpenAI API key and add it manually in a virtual environment** to the backend configuration.
 
 ## Docker Support
 
